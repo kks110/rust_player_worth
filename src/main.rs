@@ -3,23 +3,26 @@ use serde_json::Value;
 
 #[tokio::main]
 async fn main() {
-    dotenv::dotenv().ok();
-
-    let api_key = env::var("RIOT_API_KEY")
-        .expect("Expected a token in the environment");
 
 
-    match untyped_example(&api_key).await {
+
+    match untyped_example().await {
         Some(s) => print!("{}", s),
         None => {}
     }
 }
 
+fn api_key() -> String {
+    dotenv::dotenv().ok();
 
-async fn untyped_example(api_key: &str) -> Option<String> {
+    env::var("RIOT_API_KEY")
+        .expect("Expected an api key in the environment")
+}
+
+async fn untyped_example() -> Option<String> {
     let request_url = format!("https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{player}?api_key={key}",
                               player = "kks110",
-                              key = api_key);
+                              key = api_key());
     let response = match reqwest::get(&request_url).await {
         Ok(res) => res,
         Err(_) => return None
